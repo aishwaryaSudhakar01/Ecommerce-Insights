@@ -7,8 +7,6 @@ My project encompasses two such cases
 
 ## Customer Analysis
 
-### Problem Statements, Business Purpose, and Approach Using SQL
-
 #### Customer Segmentation
 
 **Problem Statement:**
@@ -55,8 +53,6 @@ How can we predict customer churn to proactively implement retention strategies 
 - Implement predictive analytics to forecast churn and prioritize retention efforts effectively.
 
 ## Supply Chain Management
-
-### Problem Statements, Business Purpose, and Approach Using SQL
 
 #### Inventory Management
 
