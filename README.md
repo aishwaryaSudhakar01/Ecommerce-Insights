@@ -1,11 +1,11 @@
 # E-commerce Insights: Harnessing Data for Business Success
 In the fast-paced world of e-commerce, data-driven insights are crucial for understanding customer behavior, optimizing operations, and driving business growth. This repository explores key SQL analyses that provide valuable insights into customer segmentation, lifetime value prediction, supply chain management, and more.
 
-My project encompasses two such cases
-1. [Customer Analysis](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/README.md#customer-analysis)
+My project encompasses two such business cases:
+1. [Customer Behavior Analysis](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/README.md#customer-behavior-analysis)
 2. [Supply Chain Management](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/README.md#supply-chain-management)
 
-## Customer Analysis
+## Customer Behavior Analysis
 
 #### Customer Segmentation
 
@@ -40,7 +40,7 @@ How can we predict the lifetime value of customers to optimize retention strateg
 #### Customer Churn Prediction
 
 **Problem Statement:**
-How can we predict customer churn to proactively implement retention strategies and reduce customer attrition?
+How can we predict customer churn to implement retention strategies and reduce customer attrition proactively?
 
 **Business Purpose:**
 - Reduce Churn Rates: Identify at-risk customers and implement targeted retention tactics.
