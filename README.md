@@ -22,6 +22,8 @@ How can we better understand our customers' purchasing behaviors to personalize 
 - **Segmentation Analysis:** Classify customers into value segments (High Value, Medium Value, Low Value) based on their spending, and frequency segments (Frequent, Regular, Infrequent) based on their purchase patterns.
 - **Strategic Insights:** Utilize these segments to design customized marketing strategies, ensuring we connect with customers in a meaningful and impactful way.
 
+[**SQL Project Link**] (https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/customer_behavior_analysis.sql)
+
 #### Customer Lifetime Value Prediction
 
 **Problem Statement:**
@@ -83,3 +85,5 @@ How can we analyze and improve our shipment performance to ensure timely deliver
 - **Delivery Time Analysis:** Compare actual vs. estimated delivery dates using SQL date functions to assess performance.
 - **Performance Classification:** Classify orders as 'Delayed' or 'On time' to evaluate and improve delivery performance.
 - **Operational Insights:** Calculate average delivery times to identify areas for improvement and optimize logistics operations, ensuring we meet customer expectations consistently.
+
+[**SQL Project Link**] (https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/supply_chain_management.sql)
