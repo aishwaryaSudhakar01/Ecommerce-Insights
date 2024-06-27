@@ -1,11 +1,11 @@
 # E-commerce Insights: Harnessing Data for Business Success
-In today's competitive e-commerce landscape, data is more than just numbers—it's the key to understanding your customers and optimizing your operations. This repository showcases how SQL can transform raw data into valuable insights for strategic decision-making in customer analysis and supply chain management.
+In today's competitive e-commerce landscape, data is more than just numbers—it's the key to understanding customers and optimizing operations. 
 
-My project encompasses two such business cases:
+This repository showcases how SQL can transform raw data into valuable insights for strategic decision-making in customer analysis and supply chain management:
 1. [Customer Behavior Analysis](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/README.md#customer-behavior-analysis)
 2. [Supply Chain Management](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/README.md#supply-chain-management)
 
-## Customer Analysis
+## Customer Behavior Analysis
 
 #### Customer Segmentation
 
