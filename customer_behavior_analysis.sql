@@ -1,78 +1,158 @@
--- Customer Segmentation
-WITH customer_agg AS (
-    SELECT
-        c.customer_id,
-        COUNT(o.order_id) AS total_orders,
-        SUM(p.payment_value) AS total_spent,
-        DATEDIFF(MAX(o.order_purchase_timestamp), MIN(o.order_purchase_timestamp)) / COUNT(o.order_id) AS avg_time_between_orders,
-        MAX(o.order_purchase_timestamp) AS last_order_date
-    FROM
-        customers c
-    JOIN orders o ON c.customer_id = o.customer_id
-    JOIN order_payments p ON o.order_id = p.order_id
-    GROUP BY c.customer_id
+-- create segmented_customers table with segments based on total amount spent and average days between purchases
+CREATE TABLE retail.segmented_customers AS 
+WITH customer_summary AS (
+  SELECT
+    CustomerID,
+    ROUND(SUM(Quantity * UnitPrice)) AS total_amount_spent,
+    ROUND((DATE_DIFF(MAX(InvoiceDate), MIN(InvoiceDate), DAY) / COUNT(*))) AS avg_days_between_purchases
+  FROM `retail.retail_data` 
+  WHERE CustomerID IS NOT NULL
+  GROUP BY CustomerID
 )
 
 SELECT
-  customer_id,
-  total_orders,
-  total_spent,
-  avg_time_between_orders,
-  CASE  
-    WHEN total_spent > 10000 THEN 'High Value'
-	WHEN total_spent BETWEEN 5000 AND 10000 THEN 'Medium Value'
-	ELSE 'Low Value'
+  CustomerID,
+  total_amount_spent,
+  avg_days_between_purchases,
+  CASE
+    WHEN value_segment = 1 THEN 'Low'
+    WHEN value_segment = 2 THEN 'Medium'
+    WHEN value_segment = 3 THEN 'High'
+    ELSE NULL
   END AS value_segment,
-  CASE 
-	WHEN avg_time_between_orders < 30 THEN 'Frequent'
-	WHEN avg_time_between_orders BETWEEN 30 AND 90 THEN 'Regular'
-	ELSE 'Infrequent'
+  CASE
+    WHEN frequency_segment = 1 THEN 'Frequent'
+    WHEN frequency_segment = 2 THEN 'Regular'
+    WHEN frequency_segment = 3 THEN 'Infrequent'
+    ELSE NULL
   END AS frequency_segment
-FROM
-  customer_agg;
+FROM (
+  SELECT
+    CustomerID,
+    total_amount_spent,
+    avg_days_between_purchases,
+    NTILE(3) OVER (ORDER BY total_amount_spent) AS value_segment, 
+    NTILE(3) OVER (ORDER BY avg_days_between_purchases) AS frequency_segment
+  FROM customer_summary
+  WHERE avg_days_between_purchases <> 0
+);
 
--- Customer Lifetime Value Prediction
-WITH customer_lifetime AS (
-    SELECT
-        c.customer_id,
-        AVG(p.payment_value) AS avg_order_value,
-        COUNT(o.order_id) / DATEDIFF(MAX(o.order_purchase_timestamp), MIN(o.order_purchase_timestamp)) * 365 AS purchase_frequency_per_year,
-        DATEDIFF(MAX(o.order_purchase_timestamp), MIN(o.order_purchase_timestamp)) / 365 AS customer_lifespan_years
-    FROM
-        customers c
-    JOIN orders o ON c.customer_id = o.customer_id
-    JOIN order_payments p ON o.order_id = p.order_id
-    GROUP BY c.customer_id
-)
+-- display segmented customers
+SELECT *
+FROM `retail.segmented_customers`
+ORDER BY CustomerID;
 
-SELECT 
-    customer_id,
-    avg_order_value * purchase_frequency_per_year * customer_lifespan_years AS predicted_clv
-FROM
-    customer_lifetime;
+-- count of occurrence of customer segments
+SELECT
+  CONCAT(value_segment, ' - ', frequency_segment) AS segment_combination,
+  COUNT(*) AS frequency_count
+FROM `retail.segmented_customers`
+GROUP BY CONCAT(value_segment, ' - ', frequency_segment)
+ORDER BY segment_combination DESC;
 
--- Customer Churn Prediction
-WITH recent_orders AS (
-    SELECT
-        customer_id,
-        MAX(order_purchase_timestamp) AS last_order_date
-    FROM
-        orders
-    GROUP BY customer_id
+-- dormant vs consistent customers
+WITH customer_purchases AS (
+  SELECT
+    CustomerID,
+    MIN(InvoiceDate) AS first_purchase_date,
+    MAX(InvoiceDate) AS last_purchase_date
+  FROM`retail.retail_data`
+  WHERE InvoiceDate BETWEEN TIMESTAMP('2010-12-01') AND TIMESTAMP('2011-12-09')
+  GROUP BY CustomerID
+),
+
+customer_classification AS (
+  SELECT
+    CustomerID,
+    CASE
+      WHEN first_purchase_date BETWEEN TIMESTAMP('2010-12-01') AND TIMESTAMP('2011-06-30')
+        AND last_purchase_date BETWEEN TIMESTAMP('2011-07-01') AND TIMESTAMP('2011-12-09')
+          THEN 'Consistent'
+      WHEN first_purchase_date BETWEEN TIMESTAMP('2010-12-01') AND TIMESTAMP('2011-06-30')
+        AND last_purchase_date <= TIMESTAMP('2011-06-30')
+        THEN 'Dormant'
+      ELSE 'Other'
+    END AS customer_status
+  FROM customer_purchases
+  WHERE  CustomerID IN (
+    SELECT DISTINCT CustomerID
+    FROM `retail.segmented_customers`
+  )
 )
 
 SELECT
-    ro.customer_id,
-    CASE 
-        WHEN DATEDIFF(CURDATE(), ro.last_order_date) > 365 THEN 'Churned'
-        ELSE 'Active'
-    END AS churn_status,
-    c.customer_unique_id,
-    c.customer_city,
-    c.customer_state,
-    c.customer_zip_code_prefix
-FROM
-    recent_orders ro
-JOIN customers c ON ro.customer_id = c.customer_id
-ORDER BY churn_status DESC;
+  COUNTIF(customer_status = 'Dormant') AS dormant_count,
+  COUNTIF(customer_status = 'Consistent') AS consistent_count,
+  ROUND(COUNTIF(customer_status = 'Consistent') / COUNT(*) * 100) AS consistent_percentage
+FROM customer_classification
+WHERE customer_status IN ('Dormant', 'Consistent');
 
+-- customer lifetime value
+WITH customer_revenue AS (
+  SELECT
+    CustomerID,
+    ROUND(SUM(Quantity * UnitPrice)) AS total_revenue
+  FROM `retail.retail_data`
+  WHERE CustomerID IS NOT NULL
+  GROUP BY CustomerID
+),
+
+purchase_frequency AS (
+  SELECT
+    CustomerID,
+    COUNT(DISTINCT InvoiceNo) AS total_transactions
+  FROM `retail.retail_data`
+  WHERE CustomerID IS NOT NULL
+  GROUP BY CustomerID
+),
+
+average_purchase_frequency AS (
+  SELECT AVG(total_transactions) AS avg_purchase_frequency
+  FROM purchase_frequency
+),
+
+customer_lifespan AS (
+  SELECT
+    CustomerID,
+    DATE_DIFF(MAX(InvoiceDate), MIN(InvoiceDate), DAY) AS lifespan_days
+  FROM`retail.retail_data`
+  WHERE CustomerID IS NOT NULL
+  GROUP BY CustomerID
+),
+
+average_customer_lifespan AS (
+  SELECT ROUND(AVG(lifespan_days) / 30) AS avg_lifespan_months 
+  FROM customer_lifespan
+)
+
+SELECT
+  cr.CustomerID,
+  cr.total_revenue,
+  pf.total_transactions,
+  ROUND((cr.total_revenue / pf.total_transactions)) AS avg_order_value,
+  acf.avg_purchase_frequency,
+  acl.avg_lifespan_months,
+  ROUND((cr.total_revenue / pf.total_transactions) * acf.avg_purchase_frequency * acl.avg_lifespan_months) AS clv
+FROM customer_revenue cr
+JOIN purchase_frequency pf
+  ON
+    cr.CustomerID = pf.CustomerID,
+    average_purchase_frequency acf,
+    average_customer_lifespan acl
+ORDER BY clv DESC;
+
+-- Calculate Churn Rate
+WITH customer_summary AS (
+  SELECT
+    CustomerID,
+    MAX(InvoiceDate) AS last_purchase_date
+  FROM `retail.retail_data`
+  WHERE CustomerID IS NOT NULL
+  GROUP BY CustomerID
+)
+
+SELECT
+  COUNTIF(last_purchase_date < TIMESTAMP('2011-06-01')) AS churned_customers,
+  COUNT(DISTINCT CustomerID) AS total_customers,
+  ROUND(COUNTIF(last_purchase_date < TIMESTAMP('2011-06-01')) * 100.0 / COUNT(DISTINCT CustomerID)) AS churn_rate
+FROM customer_summary;
