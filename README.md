@@ -1,89 +1,69 @@
-# E-commerce Insights: Harnessing Data for Business Success
-In today's competitive e-commerce landscape, data is more than just numbers—it's the key to understanding customers and optimizing operations. 
+# Online Retail Dataset Analysis
 
-This repository showcases how SQL can transform raw data into valuable insights for strategic decision-making in customer analysis and supply chain management:
-1. [Customer Behavior Analysis](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/README.md#customer-behavior-analysis)
-2. [Supply Chain Management](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/README.md#supply-chain-management)
+This repository contains SQL queries to analyze customer behavior and trends using the Online Retail Dataset from the UCI Machine Learning Repository. The analysis covers various aspects, including customer segmentation, dormant vs. consistent customers, customer lifetime value, and churn rate.
 
-## Customer Behavior Analysis
+![sql_pj1](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/assets/126569607/8437f521-4dd0-427f-acf1-9115e1d47493)
 
-#### Customer Segmentation
+## Dataset
 
-**Problem Statement:**
-How can we better understand our customers' purchasing behaviors to personalize marketing efforts and boost engagement?
+The dataset consists of transactions from a UK-based online retailer from 2010 to 2011. Each row represents a transaction, including details such as `CustomerID`, `InvoiceDate`, `Quantity`, and `UnitPrice`.
 
-**Business Purpose:**
-- **Enhance Marketing Effectiveness:** By understanding distinct customer segments, we can tailor our marketing campaigns to meet the specific needs and preferences of each group.
-- **Improve Customer Retention:** Identifying high-value customers allows us to focus our retention efforts where they matter most, fostering loyalty and long-term relationships.
-- **Optimize Resource Allocation:** Efficiently allocate marketing budgets by targeting segments with the highest potential ROI.
+[Online Retail Dataset](https://archive.ics.uci.edu/dataset/352/online+retail)
 
-**Approach Using SQL:**
-- **Data Aggregation:** Use SQL to gather comprehensive data on each customer's orders, including total orders, total spending, and average time between purchases.
-- **Segmentation Analysis:** Classify customers into value segments (High Value, Medium Value, Low Value) based on their spending, and frequency segments (Frequent, Regular, Infrequent) based on their purchase patterns.
-- **Strategic Insights:** Utilize these segments to design customized marketing strategies, ensuring we connect with customers in a meaningful and impactful way.
+## Queries and Analyses
 
-#### Customer Lifetime Value Prediction
+### 1. Customer Segmentation
 
-**Problem Statement:**
-How can we predict the long-term value of our customers to refine our retention strategies and marketing investments?
+**Problem Statement:** Segment customers based on their total spending and average days between purchases.
 
-**Business Purpose:**
-- **Enhance Retention Strategies:** Focus on retaining customers with the highest predicted lifetime value, ensuring we invest in those most likely to provide substantial long-term revenue.
-- **Optimize Marketing Spend:** Allocate resources more effectively by prioritizing high-CLV customers, maximizing the return on marketing investments.
-- **Drive Profitability:** Make data-driven decisions to boost overall business profitability by understanding and leveraging CLV insights.
+**SQL Functions and Steps:**
+- **Aggregating Data:** Calculate the total amount spent and average days between purchases for each customer.
+- **Segmentation:** Use NTILE to divide customers into segments (Low, Medium, High) based on total spending and purchase frequency (Frequent, Regular, Infrequent).
 
-**Approach Using SQL:**
-- **Data Calculation:** Compute the average order value, purchase frequency per year, and customer lifespan using SQL aggregates.
-- **CLV Prediction:** Multiply these factors to estimate each customer's lifetime value, providing a clear picture of their long-term worth.
-- **Actionable Insights:** Use predicted CLV to inform retention and marketing strategies, ensuring we focus efforts on the customers who matter most.
+![sql_1](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/assets/126569607/3f48b8bc-136f-4eb6-94ba-0bcb7ff34b82)
 
-#### Customer Churn Prediction
+![sql_2](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/assets/126569607/1e39e485-0e0c-4712-951d-f72476fc94c5)
 
-**Problem Statement:**
-How can we identify customers at risk of churning and proactively implement measures to retain them?
+### 2. Count of Occurrence of Customer Segments
 
-**Business Purpose:**
-- **Reduce Churn Rates:** Pinpoint at-risk customers and deploy targeted retention strategies to keep them engaged.
-- **Enhance Customer Loyalty:** Improve overall customer satisfaction and loyalty by addressing churn risk factors before they escalate.
-- **Optimize Customer Service:** Anticipate customer needs and prevent churn through proactive measures and timely interventions.
+**Problem Statement:** Determine the frequency of each customer segment combination.
 
-**Approach Using SQL:**
-- **Pattern Analysis:** Examine historical order data to identify behaviors indicative of potential churn.
-- **Churn Identification:** Determine churn likelihood based on the time elapsed since the last purchase using SQL date functions.
-- **Predictive Analytics:** Forecast churn and prioritize retention efforts effectively, ensuring we stay ahead of potential issues and maintain strong customer relationships.
+**SQL Functions and Steps:**
+- **Concatenation and Counting:** Combine the value and frequency segments into a single column and count occurrences of each segment combination.
+- **Grouping and Ordering:** Group by the concatenated segment combination and order by the frequency count.
 
-**Access the project here:** [Customer Behavior Analysis SQL](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/customer_behavior_analysis.sql)
+![sql_3](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/assets/126569607/506971f3-34d0-4471-a9e5-a1c8422b8d52)
 
-## Supply Chain Management
+### 3. Dormant vs. Consistent Customers
 
-#### Inventory Management
+**Problem Statement:** Identify customers who have become dormant versus those who are consistent.
 
-**Problem Statement:**
-How can we maintain optimal inventory levels to meet demand without overstocking?
+**SQL Functions and Steps:**
+- **Purchase Dates:** Calculate the first and last purchase dates for each customer.
+- **Classification:** Classify customers as 'Consistent' or 'Dormant' based on their purchase activity within specified date ranges.
 
-**Business Purpose:**
-- **Minimize Stockouts:** Ensure products are available to meet customer demand, enhancing satisfaction and loyalty.
-- **Reduce Holding Costs:** Optimize inventory levels to lower storage and carrying costs, improving overall efficiency.
-- **Improve Supply Chain Efficiency:** Align inventory levels with demand patterns to streamline operations and reduce waste.
+![sql_4](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/assets/126569607/b79ac75e-c56d-46d3-ad75-9242e9febe66)
 
-**Approach Using SQL:**
-- **Sales Data Aggregation:** Collect and analyze product sales data alongside current inventory levels.
-- **Demand Classification:** Use SQL to classify products into demand categories (High, Medium, Low) based on sales data.
-- **Inventory Optimization:** Develop strategies to manage inventory effectively, ensuring product availability while minimizing excess stock.
+### 4. Customer Lifetime Value (CLV)
 
-#### Shipment Performance
+**Problem Statement:** Calculate the customer lifetime value.
 
-**Problem Statement:**
-How can we analyze and improve our shipment performance to ensure timely deliveries and enhance customer satisfaction?
+**SQL Functions and Steps:**
+- **Revenue Calculation:** Calculate total revenue per customer.
+- **Purchase Frequency:** Determine the total number of transactions per customer.
+- **Average Values:** Calculate the average order value, purchase frequency, and customer lifespan.
+- **CLV Calculation:** Use the above values to compute the customer lifetime value.
 
-**Business Purpose:**
-- **Ensure Timely Deliveries:** Monitor delivery times to meet customer expectations and reduce delays, fostering trust and loyalty.
-- **Enhance Customer Experience:** Improve overall satisfaction by optimizing shipping processes and ensuring reliable delivery times.
-- **Optimize Logistics:** Identify bottlenecks and inefficiencies in the delivery process to streamline operations and enhance performance.
+![sql_5](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/assets/126569607/b8c2601e-9230-4796-a177-2fec2bc608ee)
 
-**Approach Using SQL:**
-- **Delivery Time Analysis:** Compare actual vs. estimated delivery dates using SQL date functions to assess performance.
-- **Performance Classification:** Classify orders as 'Delayed' or 'On time' to evaluate and improve delivery performance.
-- **Operational Insights:** Calculate average delivery times to identify areas for improvement and optimize logistics operations, ensuring we meet customer expectations consistently.
+![sql_6](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/assets/126569607/45ff0713-03e2-489a-ad54-ebbb70caf27a)
 
-**Access the project here:** [Supply Chain Management SQL](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/blob/main/supply_chain_management.sql)
+### 5. Churn Rate
+
+**Problem Statement:** Calculate the churn rate for the customers.
+
+**SQL Functions and Steps:**
+- **Last Purchase Date:** Identify the last purchase date for each customer.
+- **Churn Calculation:** Determine the number of churned customers (those whose last purchase was before a specific date) and calculate the churn rate.
+
+![sql_7](https://github.com/aishwaryaSudhakar01/Ecommerce-Insights/assets/126569607/fa321d1d-a423-4a2b-bf51-14a573d3f4e6)
